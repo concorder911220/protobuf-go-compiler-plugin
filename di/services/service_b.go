@@ -13,9 +13,6 @@ type ServiceB struct {
 func NewServiceB() *ServiceB {
 	return &ServiceB{}
 }
-func (s *ServiceB) SetServiceA(serviceA common.IServiceA) {
-	s.serviceA = serviceA
-}
 
 func (s *ServiceB) Validate() error {
 	if s.serviceA == nil {
@@ -29,5 +26,5 @@ func (s *ServiceB) DoSomethingElse() {
 }
 
 func (s *ServiceB) Register(serviceA common.IServiceA) {
-	s.SetServiceA(serviceA)
+	s.serviceA = serviceA
 }

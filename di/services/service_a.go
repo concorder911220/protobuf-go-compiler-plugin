@@ -14,10 +14,6 @@ func NewServiceA() *ServiceA {
 	return &ServiceA{}
 }
 
-func (s *ServiceA) SetServiceB(serviceB common.IServiceB) {
-	s.serviceB = serviceB
-}
-
 func (s *ServiceA) Validate() error {
 	if s.serviceB == nil {
 		return errors.New("ServiceA: ServiceB is not set")
@@ -32,5 +28,5 @@ func (s *ServiceA) DoSomething() {
 }
 
 func (s *ServiceA) Register(serviceB common.IServiceB) {
-	s.SetServiceB(serviceB)
+	s.serviceB = serviceB
 }
