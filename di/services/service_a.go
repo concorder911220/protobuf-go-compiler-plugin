@@ -1,23 +1,20 @@
 package services
 
 import (
+	"di/common"
 	"errors"
 	"fmt"
 )
 
-type IServiceB interface {
-	DoSomethingElse()
-}
-
 type ServiceA struct {
-	serviceB IServiceB
+	serviceB common.IServiceB
 }
 
 func NewServiceA() *ServiceA {
 	return &ServiceA{}
 }
 
-func (s *ServiceA) SetServiceB(serviceB IServiceB) {
+func (s *ServiceA) SetServiceB(serviceB common.IServiceB) {
 	s.serviceB = serviceB
 }
 
@@ -32,4 +29,8 @@ func (s *ServiceA) DoSomething() {
 
 	fmt.Println("ServiceA is doing something.")
 
+}
+
+func (s *ServiceA) Register(serviceB common.IServiceB) {
+	s.SetServiceB(serviceB)
 }
