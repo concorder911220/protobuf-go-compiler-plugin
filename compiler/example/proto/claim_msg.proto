@@ -1,0 +1,298 @@
+syntax = "proto3";
+
+package gb.insurance.claim.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/claim/dto";
+
+enum ClaimStatus {
+  CLAIM_STATUS_NEW = 0; // claim created
+  CLAIM_STATUS_PENDING = 1;  // loss notice sent
+  CLAIM_STATUS_COVERAGE = 2; // coverage response received
+  CLAIM_STATUS_SUCCESS = 3;  // acknowledge sent
+  CLAIM_STATUS_ERROR = 4;    // error occured
+}
+
+enum OpeningTypeCode {
+  OPENING_TYPE_CODE_WR = 0; // Windshield Repair
+  OPENING_TYPE_CODE_WS = 1; // Windshield
+  OPENING_TYPE_CODE_DR = 2; // Door
+  OPENING_TYPE_CODE_SI = 3; // Side
+  OPENING_TYPE_CODE_VN = 4; // Vent
+  OPENING_TYPE_CODE_QT = 5; // Quarter
+  OPENING_TYPE_CODE_PT = 6; // Partition
+  OPENING_TYPE_CODE_BK = 7; // Back Window
+  OPENING_TYPE_CODE_RF = 8; // Roof
+}
+
+enum PositionCode {
+  POSITION_CODE_B = 0; // Back
+  POSITION_CODE_F = 1; // Front
+  POSITION_CODE_M = 2; // Middle
+  POSITION_CODE_R = 3; // Rear
+}
+
+enum RelativeLocationCode {
+  RELATIVE_LOCATION_CODE_IN = 0; // Inner
+  RELATIVE_LOCATION_CODE_LO = 1; // Lower
+  RELATIVE_LOCATION_CODE_OU = 2; // Outer
+  RELATIVE_LOCATION_CODE_UP = 3; // Upper
+}
+
+enum SideCode {
+  SIDE_CODE_L = 0; // Left
+  SIDE_CODE_R = 1; // Right
+  SIDE_CODE_C = 2; // Center
+}
+
+enum VehicleOwnership {
+  VEHICLE_OWNERSHIP_OWNER = 0;
+  VEHICLE_OWNERSHIP_COMMERCIAL = 1;
+  VEHICLE_OWNERSHIP_RENTAL = 2;
+  VEHICLE_OWNERSHIP_BORROWED = 3;
+  VEHICLE_OWNERSHIP_THIRD_PARTY = 4;
+}
+
+enum VehicleType {
+  VEHICLE_TYPE_STANDARD = 0;
+  VEHICLE_TYPE_RV= 1;
+}
+
+enum CauseOfLossCode {
+  CAUSE_OF_LOSS_101 = 0; // Rock from Road - No One at Fault
+  CAUSE_OF_LOSS_105 = 1; // Rock from Road - 3rd Party Fault License #
+  CAUSE_OF_LOSS_111 = 2; // Animal
+  CAUSE_OF_LOSS_121 = 3; // Tree Branch
+  CAUSE_OF_LOSS_131 = 4; // Garage Door
+  CAUSE_OF_LOSS_199 = 5; // Other Object
+  CAUSE_OF_LOSS_201 = 6; // Collision
+  CAUSE_OF_LOSS_301 = 7; // Vandalism – 3rd Party Known
+  CAUSE_OF_LOSS_311 = 8; // Vandalism – 3rd Party Unknown
+  CAUSE_OF_LOSS_321 = 9; // Terrorism
+  CAUSE_OF_LOSS_331 = 10; // Attempted Theft
+  CAUSE_OF_LOSS_341 = 11; // Theft
+  CAUSE_OF_LOSS_401 = 12; // Extreme Heat or Cold Weather
+  CAUSE_OF_LOSS_411 = 13; // Hail Storm
+  CAUSE_OF_LOSS_421 = 14; // Hurricane
+  CAUSE_OF_LOSS_431 = 15; // Earthquake
+  CAUSE_OF_LOSS_499 = 16; // Other Storm
+  CAUSE_OF_LOSS_901 = 17; // Unknown
+}
+
+message CreateClaimRequest {
+  int32 job_id = 1;
+  string provider_name = 2;
+  Customer customer = 3;
+  Vehicle vehicle = 4;
+  Insurance insurance = 5;
+  Agent agent = 6;
+  AdditionalInfo additional_info = 7;
+  AcknowledgementDetails acknowledgement_details = 8;
+  repeated DamageInfo damage_info = 9;
+}
+
+message CreateClaimResponse { int32 id = 1; }
+
+message UpdateClaimRequest {
+  int32 id = 1;
+  optional bool archived = 2;
+}
+
+message UpdateClaimResponse {}
+
+message GetClaimRequest { int32 id = 1; }
+
+message GetJobLastClaimRequest { int32 job_id = 1; }
+
+message GetClaimResponse { ClaimData claim = 1; }
+
+message ListClaimRequest {
+  int32 page_size = 1;
+  int32 page = 2;
+  OrderBy order_by = 3;
+  optional int32 shop_id = 4;
+  optional ClaimStatus status = 5;
+  optional string id = 6;
+  optional string job_id = 7;
+  optional string reference_number = 8;
+  optional string insurer_name = 9; // insurance company name
+  optional string insurer_phone = 10; // insurance company phone
+  optional string customer_name = 11; // customer first or last name
+  optional string vehicle = 12; // vehicle year, make, model
+  optional string submitted_dt = 13;
+  optional bool archived = 14;
+}
+
+message OrderBy {
+  string field = 1;
+  bool desc = 2;
+}
+
+message ListClaimResponse { 
+  repeated ClaimShortData claim = 1; 
+  int32 total_count = 2;
+}
+
+message AcknowledgeClaimRequest {
+  int32 id = 1;
+  AcknowledgementDetails acknowledgement_details = 2;
+}
+
+message AcknowledgeClaimResponse {}
+
+message ClaimData {
+  int32 id = 1;
+  int32 job_id = 2;
+  int32 created_user_id = 3;
+  google.protobuf.Timestamp created_dt = 4;
+  string unique_id = 5;
+  int32 shop_id = 6;
+  string provider_name = 8;
+  Customer customer = 9;
+  Vehicle vehicle = 10;
+  Insurance insurance = 11;
+  Agent agent = 12;
+  AdditionalInfo additional_info = 13;
+  repeated DamageInfo damage_info = 14;
+  ClaimResult result = 15;
+  AcknowledgementDetails acknowledgement_details = 16;
+  bool archived = 17;
+}
+
+message Customer {
+  int32 id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string phone1 = 4;
+  string phone2 = 5;
+  string state = 6;
+  string city = 7;
+  string street_address = 8;
+  string postal_code = 9;
+}
+
+message Vehicle {
+  int32 id = 1;
+  string vin = 2;
+  int32 year = 3;
+  string make = 4;
+  string model = 5;
+  string plate_number = 6;
+  string image_url = 7;
+  string thumb_url = 8;
+  VehicleOwnership ownership = 9;
+  string nags_id = 10;
+  VehicleType vehicle_type = 11;
+  int32 number = 12; // Vehicle number in the policy (to vehicle if multiple vehicles in the policy)
+  string style = 13;
+  int32 make_id = 14;
+  int32 model_id = 15;
+}
+
+message Insurance {
+  string insurer_id = 2;
+  string policy_number = 3;
+  string policy_state = 4;
+  google.protobuf.Timestamp date_of_loss = 5;
+}
+
+message Agent {
+  string first_name = 2;
+  string last_name = 3;
+  string phone = 4;
+  string agency_name = 5;
+}
+
+message AdditionalInfo {
+  bool glass_only_damage = 1;
+  bool bodily_injury = 2;
+  string origination_contact_name = 3;
+  CauseOfLossCode cause_of_loss_code = 4;
+  int32 destination_pid = 5;
+  string subrogation_contact_name = 6;
+  string subrogation_data = 7;
+}
+
+message DamageInfo {
+  OpeningTypeCode opening_type_code = 1;
+  PositionCode position_code = 2;
+  RelativeLocationCode relative_location_code = 3;
+  SideCode side_code = 4;
+  int32 glass_damage_quantity = 5;
+  bool repair_qualification = 6;
+}
+
+message ClaimResult {
+  string reference_number = 1;
+  optional string error_code = 2;
+  ClaimStatus status = 3;
+  string error_message = 4;
+  string insurer_phone = 5;
+  optional google.protobuf.Timestamp coverage_response_dt = 6;
+  string claim_request = 8;
+  string claim_response = 9;
+  string coverage_response = 10;
+  optional google.protobuf.Timestamp acknowledgement_dt = 11;
+  string acknowledgement_request = 12;
+  string acknowledgement_response = 13;
+  CoverageResponseVehicle coverage_response_vehicle = 14;
+}
+
+message CoverageResponseVehicle {
+	string error_code = 1;
+	string error_text = 2;
+	double deductible = 3;
+	string nags_id = 4;
+	int32 number = 5;
+	string alternative_number = 6;
+	string description = 7;
+}
+
+message ClaimShortData {
+  int32 job_id = 1;
+  int32 id = 2;
+  google.protobuf.Timestamp submitted_dt = 3;
+  ClaimStatus status = 4;
+  string error_message = 5;
+  string reference_number = 6;
+  string customer_name = 7;
+  string vehicle = 8;
+  string insurer_name = 9;
+  string insurer_phone = 10;
+  bool archived = 11;
+}
+
+message UpdateCoverageRequest {
+  string provider_name = 1;
+	string coverage_response = 2;
+}
+
+message UpdateCoverageResponse {
+}
+
+message AcknowledgementDetails {
+  bool mobile_indicator = 2;
+  string acceptance_contact = 3;
+  string work_location_postal_code = 4;
+  google.protobuf.Timestamp requested_appointment_dt = 5;
+}
+
+message ListInsurerRequest {
+  string provider_name = 1;
+  optional bool active = 2;
+  optional bool enol = 3;
+}
+
+message ListInsurerResponse {
+  repeated InsurerData insurer = 1;
+}
+
+message InsurerData {
+  string provider_name = 1;
+  string external_id = 2;
+  string name = 3;
+  bool active = 4;
+  bool enol = 5;
+  string last_updated = 6;
+}
