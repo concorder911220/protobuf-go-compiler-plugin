@@ -1,0 +1,31 @@
+package app
+
+{{ if .HasTimestamp }}
+import timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+{{ end }}
+
+{{- range .Enums }}
+type {{ .EnumName }} int32
+
+const (
+{{- range .Values }}
+	{{ .Name }} {{ .PName }} = {{ .Value }} 
+{{- end }}
+)
+{{- end }}
+
+{{- range .Messages }}
+type {{ .MessageName }} struct {
+{{- range .Fields }}
+	{{ .Name }} {{ .Type }}
+{{- end }}
+}
+{{- end }}
+
+{{- range .Services }}
+type {{ .SName }} interface {
+	{{- range .Methods }}
+	{{ .MName }}(req *{{ .RequestType }}) (*{{ .ResponseType }}, error)
+	{{- end }}
+}
+{{- end }}

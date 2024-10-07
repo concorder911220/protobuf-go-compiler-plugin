@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package gb.accounting.payment.settings.v1;
+
+option go_package = "github.com/NewGlassbiller/gb-services-accounting/pkg/proto/payment/settings/grpc";
+
+import "gb/payment/settings/v1/settings_msg.proto";
+import "google/api/annotations.proto";
+
+service Main {
+  rpc Update(UpdateRequest) returns (UpdateResponse) {
+    option (google.api.http) = {
+      patch : "/payment/settings"
+      body : "*"
+    };
+  };
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (google.api.http) = {
+      get : "/payment/settings"
+    };
+  };
+}
