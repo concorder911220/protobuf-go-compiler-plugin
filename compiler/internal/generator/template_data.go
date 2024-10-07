@@ -18,7 +18,6 @@ type Field struct {
 	Number       int
 	ProtoName    string
 	HasTimestamp bool
-	// Optional  string
 }
 
 type Service struct {
