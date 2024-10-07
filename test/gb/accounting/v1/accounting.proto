@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package gb.accounting.v1;
+
+option go_package = "github.com/NewGlassbiller/gb-services-accounting/pkg/proto/accounting/grpc";
+
+import "gb/accounting/v1/accounting_msg.proto";
+import "google/api/annotations.proto";
+
+service Main {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {
+    option (google.api.http) = {
+      post : "/account"
+      body : "*"
+    };
+  };
+  rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {
+    option (google.api.http) = {
+      patch : "/account"
+      body : "*"
+    };
+  };
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {
+    option (google.api.http) = {
+      delete : "/account/{id}"
+    };
+  };
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
+    option (google.api.http) = {
+      get : "/account/{id}"
+    };
+  };
+  rpc ListAccount(ListAccountRequest) returns (ListAccountResponse) {
+    option (google.api.http) = {
+      get : "/account"
+    };
+  };
+
+  rpc ListAccountType(ListAccountTypeRequest) returns (ListAccountTypeResponse) {
+    option (google.api.http) = {
+      get : "/account/type"
+    };
+  };
+  rpc ListAccountSubtype(ListAccountSubtypeRequest) returns (ListAccountSubtypeResponse) {
+    option (google.api.http) = {
+      get : "/account/subtype"
+    };
+  };
+
+
+  rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse) {
+    option (google.api.http) = {
+      post : "/transaction"
+      body : "*"
+    };
+  };
+  rpc UpdateTransaction(UpdateTransactionRequest) returns (UpdateTransactionResponse) {
+    option (google.api.http) = {
+      patch : "/transaction"
+      body : "*"
+    };
+  };
+  rpc DeleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse) {
+    option (google.api.http) = {
+      delete : "/transaction/{id}"
+    };
+  };
+  rpc GetTransaction(GetTransactionRequest) returns (GetTransactionResponse) {
+    option (google.api.http) = {
+      get : "/transaction/{id}"
+    };
+  };
+  rpc ListTransaction(ListTransactionRequest) returns (ListTransactionResponse) {
+    option (google.api.http) = {
+      post : "/transaction/search"
+      body : "*"
+    };
+  };
+  rpc ListAccountTransaction(ListAccountTransactionRequest) returns (ListAccountTransactionResponse) {
+    option (google.api.http) = {
+      post : "/account/transaction/search"
+      body : "*"
+    };
+  };
+
+  rpc ListTransactionType(ListTransactionTypeRequest) returns (ListTransactionTypeResponse) {
+    option (google.api.http) = {
+      get : "/transaction/type"
+    };
+  };
+
+  rpc GetCustomerBalance(GetCustomerBalanceRequest) returns (GetCustomerBalanceResponse) {
+    option (google.api.http) = {
+      get : "/balance/customer/{id}"
+    };
+  };
+  rpc GetVendorBalance(GetVendorBalanceRequest) returns (GetVendorBalanceResponse) {
+    option (google.api.http) = {
+      get : "/balance/vendor/{id}"
+    };
+  };
+
+  rpc GetBalanceSheet(GetBalanceSheetRequest) returns (GetBalanceSheetResponse) {
+    option (google.api.http) = {
+      post : "/report/balance-sheet"
+      body : "*"
+    };
+  };
+  rpc GetIncomeStatement(GetIncomeStatementRequest) returns (GetIncomeStatementResponse) {
+    option (google.api.http) = {
+      post : "/report/income-statement"
+      body : "*"
+    };
+  };
+  rpc GetTransactionsByAccount(GetTransactionsByAccountRequest) returns (GetTransactionsByAccountResponse) {
+    option (google.api.http) = {
+      post : "/report/transactions-by-account"
+      body : "*"
+    };
+  };
+}

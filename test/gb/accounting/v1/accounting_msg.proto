@@ -1,0 +1,354 @@
+syntax = "proto3";
+
+package gb.accounting.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/NewGlassbiller/gb-services-accounting/pkg/proto/accounting/dto";
+
+message OrderBy {
+  string field = 1;
+  bool desc = 2;
+}
+
+message Period {
+  optional google.protobuf.Timestamp start = 1;
+  optional google.protobuf.Timestamp end = 2;
+}
+
+message NumberRange {
+  optional double min = 1;
+  optional double max = 2;
+}
+
+enum BalanceType {
+  BALANCE_TYPE_ON_DATE = 0;
+  BALANCE_TYPE_YTD = 1;
+}
+
+enum TransactionType {
+  TRANSACTION_TYPE_UNDEFINED = 0;
+
+  TRANSACTION_TYPE_CUSTOMER_INVOICE = 1;
+  TRANSACTION_TYPE_CUSTOMER_PAYMENT = 2;
+  TRANSACTION_TYPE_CUSTOMER_RETURN = 3;
+  TRANSACTION_TYPE_CUSTOMER_CREDIT = 4;
+  TRANSACTION_TYPE_CUSTOMER_REFUND = 5;
+  TRANSACTION_TYPE_CUSTOMER_PAYMENT_APPLY = 20;
+
+  TRANSACTION_TYPE_VENDOR_BILL = 6;
+  TRANSACTION_TYPE_VENDOR_PAYMENT = 7;
+  TRANSACTION_TYPE_VENDOR_RETURN = 8;
+  TRANSACTION_TYPE_VENDOR_CREDIT = 9;
+  TRANSACTION_TYPE_VENDOR_PURCHASE_ORDER_= 10;
+  TRANSACTION_TYPE_VENDOR_REFUND = 11;
+  
+  TRANSACTION_TYPE_JOURNAL_ENTRY = 12;
+  TRANSACTION_TYPE_ACCOUNT_TRANSFER = 13;
+  TRANSACTION_TYPE_DEPOSIT = 14;
+  TRANSACTION_TYPE_INVENTORY_ADJUSTMENT = 15;
+  TRANSACTION_TYPE_EXPENSE = 16;
+  TRANSACTION_TYPE_QUICK_SALE = 17;
+  TRANSACTION_TYPE_INVENTORY_TRANSACTION = 18;
+  TRANSACTION_TYPE_LEDGER_ENTRY = 19;
+}
+
+
+message AccountTypeData {
+  int32 id = 1;
+  string name = 2;
+  bool credit = 3;
+  BalanceType balance_type = 4;
+}
+
+message ListAccountTypeRequest {}
+
+message ListAccountTypeResponse {
+  repeated AccountTypeData account_type = 1;
+}
+
+message AccountSubtypeData {
+  int32 id = 1;
+  string name = 2;
+  int32 account_type_id = 3;
+  string account_type_name = 4;
+  bool credit = 5;
+  BalanceType balance_type = 6;
+}
+
+message ListAccountSubtypeRequest {}
+
+message ListAccountSubtypeResponse {
+  repeated AccountSubtypeData account_subtype = 1;
+}
+
+enum AccountStatus {
+  ACCOUNT_STATUS_DISABLED = 0;
+  ACCOUNT_STATUS_ACTIVE = 1;
+}
+
+message AccountData {
+  int32 id = 1;
+  int32 type_id = 2;
+  int32 subtype_id = 3;
+  string name = 4;
+  string description = 5;
+  string code = 6;
+  AccountStatus status = 7;
+  optional int32 parent_account_id = 8;
+  double balance = 9;
+}
+
+message CreateAccountRequest {
+  int32 organization_id = 1;
+  int32 subtype_id = 2;
+  string name = 3;
+  string description = 4;
+  string code = 5;
+  AccountStatus status = 6;
+  optional int32 parent_account_id = 7;
+}
+
+message CreateAccountResponse { 
+  int32 id = 1; 
+}
+
+message UpdateAccountRequest {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  string code = 4;
+  AccountStatus status = 5;
+  optional int32 parent_account_id = 6;
+}
+
+message UpdateAccountResponse {}
+
+message DeleteAccountRequest { 
+  int32 id = 1; 
+}
+
+message DeleteAccountResponse {}
+
+message GetAccountRequest { 
+  int32 id = 1; 
+}
+
+message GetAccountResponse { 
+  AccountData account = 1; 
+}
+
+message ListAccountRequest {
+  int32 organization_id = 1;
+  optional int32 type_id = 2;
+  optional int32 subtype_id = 3;
+  optional google.protobuf.Timestamp period_dt = 4;
+}
+
+message ListAccountResponse { 
+  repeated AccountData account = 1; 
+}
+
+message TransactionData {
+  int32 id = 1;
+  int32 shop_id = 2;
+  int32 type_id = 3;
+  google.protobuf.Timestamp transaction_dt = 4;
+  double amount = 5;
+  string description = 6;
+  int32 job_id = 7;
+  repeated TransactionItem items = 8;
+}
+
+message TransactionDataShort {
+  int32 id = 1;
+  int32 organization_id = 2;
+  int32 shop_id = 3;
+  int32 type_id = 4;
+  google.protobuf.Timestamp transaction_dt = 5;
+  double amount = 6;
+  string description = 7;
+  int32 job_id = 8;
+}
+
+message CreateTransactionRequest {
+  int32 organization_id = 1;
+  int32 shop_id = 2;
+  int32 type_id = 3;
+  google.protobuf.Timestamp transaction_dt = 4;
+  string description = 5;
+  int32 job_id = 6;
+  repeated TransactionItem items = 7;
+}
+
+message CreateTransactionResponse { 
+  int32 id = 1; 
+}
+
+message UpdateTransactionRequest {
+  int32 id = 1;
+  google.protobuf.Timestamp transaction_dt = 2;
+  string description = 4;
+  repeated TransactionItem items = 6;
+}
+
+message UpdateTransactionResponse {}
+
+message DeleteTransactionRequest { 
+  int32 id = 1; 
+}
+
+message DeleteTransactionResponse {}
+
+message GetTransactionRequest { 
+  int32 id = 1; 
+}
+
+message GetTransactionResponse { 
+  TransactionData transaction = 1; 
+}
+
+message ListTransactionRequest {
+  int32 organization_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  OrderBy order_by = 4;
+  optional int32 type_id = 5;
+  optional int32 shop_id = 6;
+  optional NumberRange amount = 7;
+  optional Period transaction_dt = 8;
+}
+
+message ListTransactionResponse { 
+  repeated TransactionDataShort transaction = 1; 
+}
+
+message TransactionItem {
+  int32 account_id = 3;
+  optional int32 customer_id = 4;
+  optional int32 vendor_id = 5;
+  double debit = 6;
+  double credit = 7;
+  int32 part_id = 8;
+  int32 quantity = 9;
+  string description = 10;
+}
+
+message TransactionTypeData {
+  int32 id = 1;
+  string name = 2;
+}
+
+message ListTransactionTypeRequest {}
+
+message ListTransactionTypeResponse {
+  repeated TransactionTypeData transaction_type = 1;
+}
+
+message GetCustomerBalanceRequest { 
+  int32 id = 1; 
+  int32 organization_id = 2;
+}
+
+message GetCustomerBalanceResponse { 
+  double balance = 1; 
+}
+
+message GetVendorBalanceRequest { 
+  int32 id = 1; 
+  int32 organization_id = 2;
+}
+
+message GetVendorBalanceResponse { 
+  double balance = 1; 
+}
+
+message AccountTransactionDataShort {
+  int32 id = 1;
+  int32 account_id = 2;
+  google.protobuf.Timestamp transaction_dt = 3;
+  int32 type_id = 4;
+  string description = 5;
+  double debit = 6;
+  double credit = 7;
+  int32 shop_id = 8;
+  repeated int32 other_account_ids = 9;
+}
+
+message ListAccountTransactionRequest {
+  int32 account_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  OrderBy order_by = 4;
+  optional int32 type_id = 5;
+  optional int32 shop_id = 6;
+  optional int32 other_account_id = 7;
+  optional NumberRange debit = 8;
+  optional NumberRange credit = 9;
+  optional Period transaction_dt = 10;
+}
+
+message ListAccountTransactionResponse { 
+  repeated AccountTransactionDataShort transaction = 1; 
+}
+
+message GetBalanceSheetRequest {
+  int32 organization_id = 1;
+  google.protobuf.Timestamp transaction_dt_to = 2;
+}
+
+message BalanceSheetRecord {
+  int32 id = 1;
+  optional int32 parent_account_id = 2;
+  int32 type_id = 3;
+  int32 subtype_id = 4;
+  string name = 5;
+  string code = 6;
+  double balance = 7;
+}
+
+message GetBalanceSheetResponse {
+  repeated BalanceSheetRecord record = 1;
+}
+
+message GetIncomeStatementRequest {
+  int32 organization_id = 1;
+  Period transaction_dt = 2;
+}
+
+message IncomeStatementRecord {
+  int32 id = 1;
+  optional int32 parent_account_id = 2;
+  int32 type_id = 3;
+  int32 subtype_id = 4;
+  string name = 5;
+  string code = 6;
+  double balance = 7;
+}
+
+message GetIncomeStatementResponse {
+  repeated IncomeStatementRecord record = 1;
+}
+
+message GetTransactionsByAccountRequest {
+  int32 account_id = 1;
+  Period transaction_dt = 2;
+}
+
+message TransactionsByAccountRecord {
+  int32 id = 1;
+  string transaction_dt = 2;
+  int32 type_id = 3;
+  string description = 4;
+  double debit = 5;
+  double credit = 6;
+  double balance = 7;
+  int32 shop_id = 8;
+  repeated int32 other_account_ids = 9;
+}
+
+message GetTransactionsByAccountResponse {
+  double start_balance = 1;
+  repeated TransactionsByAccountRecord record = 2;
+}
+
