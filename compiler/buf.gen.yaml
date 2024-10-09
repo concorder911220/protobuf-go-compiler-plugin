@@ -2,10 +2,10 @@ version: v1
 plugins:
   - plugin: gbtemplate
     out: ../
-    opt: types=true
+    opt: types=true,out=../
   - plugin: gbtemplate
     out: ../
-    opt: services=true
+    opt: services=true,out=../
   - plugin: gbtemplate
     out: ../
-    opt: methods=true
+    opt: methods=true,out=../

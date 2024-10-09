@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package gb.insurance.claim.v1;
+
+import "proto/gb.proto";
+
+option (gb_module_path) = "github.com/NewGlassbiller/gb-services-insurance/internal/user";
+
+option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/user/dto";
+
+enum UserStatus {
+  USER_STATUS_NEW = 0; // USER created
+  USER_STATUS_PENDING = 1;  // loss notice sent
+  USER_STATUS_COVERAGE = 2; // coverage response received
+  USER_STATUS_SUCCESS = 3;  // acknowledge sent
+  USER_STATUS_ERROR = 4;    // error occured
+}

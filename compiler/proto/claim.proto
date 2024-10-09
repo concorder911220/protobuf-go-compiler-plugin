@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package gb.insurance.claim.v1;
+
+option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/claim/grpc";
+import "proto/gb.proto";
+
+option (gb_module_path) = "github.com/NewGlassbiller/gb-services-insurance/internal/claim";
+
+import "proto/claim_msg.proto";
+import "google/api/annotations.proto";
+
+service Claim {
+  rpc CreateClaim(CreateClaimRequest) returns (CreateClaimResponse) {
+    option (google.api.http) = {
+      post : "/claim"
+      body : "*"
+    };
+  };
+  rpc UpdateClaim(UpdateClaimRequest) returns (UpdateClaimResponse) {
+    option (google.api.http) = {
+      patch : "/claim/{id}"
+      body : "*"
+    };
+  };
+  rpc GetClaim(GetClaimRequest) returns (GetClaimResponse) {
+    option (google.api.http) = {
+      get : "/claim/{id}"
+    };
+  };
+  rpc GetJobLastClaim(GetJobLastClaimRequest) returns (GetClaimResponse) {
+    option (google.api.http) = {
+      get : "/claim/last_by_job/{job_id}"
+    };
+  };
+  rpc ListClaim(ListClaimRequest) returns (ListClaimResponse) {
+    option (google.api.http) = {
+      get : "/claim"
+    };
+  };
+  rpc AcknowledgeClaim(AcknowledgeClaimRequest)
+      returns (AcknowledgeClaimResponse) {
+    option (google.api.http) = {
+      post : "/claim/{id}/acknowledge"
+      body : "*"
+    };
+  }
+  rpc UpdateCoverage(UpdateCoverageRequest)
+      returns (UpdateCoverageResponse) {
+    option (google.api.http) = {
+      post : "/claim/coverage"
+      body : "*"
+    };
+  }
+  rpc ListInsurer(ListInsurerRequest) returns (ListInsurerResponse) {
+    option (google.api.http) = {
+      get : "/insurer"
+    };
+  };
+}

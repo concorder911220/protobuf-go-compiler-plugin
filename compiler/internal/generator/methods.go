@@ -14,47 +14,9 @@ import (
 )
 
 // GenerateMethods generates the method handler templates.
-func GenerateMethods(services []Service, generateMethods bool) error {
+func GenerateMethods(services []Service, generateMethods bool, modulePath string, outputPath string) error {
 	if !generateMethods {
 		return nil
-	}
-
-	tmplPath := filepath.Join(".", "templates", "command.tmpl")
-
-	// Check if the template file exists
-	if _, err := os.Stat(tmplPath); os.IsNotExist(err) {
-		// Create the template file with the default content
-		defaultTemplate := `package app
-
-import (
-	"github.com/NewGlassbiller/gb-go-common/gbnet/common"
-	"github.com/NewGlassbiller/gb-go-common/gbpolicy"
-	"github.com/NewGlassbiller/gb-services-insurance/pkg/proto/{{ .ServiceNameLower }}/dto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
-)
-
-// {{ .MethodName }} handles {{ .RequestType }} and returns {{ .ResponseType }}
-func (cmd Command) {{ .MethodName }}(authUser *common.UserInfo, req *dto.{{ .RequestType }}) (*dto.{{ .ResponseType }}, error) {
-	// TODO: Add your logic here for {{ .MethodName }}
-	return nil, nil
-}`
-
-		// Ensure the "internal/templates" directory exists
-		if err := os.MkdirAll(filepath.Dir(tmplPath), os.ModePerm); err != nil {
-			log.Fatalf("Failed to create directories: %v", err)
-		}
-
-		// Write the default template content to the file
-		err = os.WriteFile(tmplPath, []byte(defaultTemplate), 0644)
-		if err != nil {
-			log.Fatalf("Failed to create template file: %v", err)
-		}
-
-		log.Println("Template file created:", tmplPath)
-	} else {
-		log.Println("Template file already exists:", tmplPath)
 	}
 
 	for _, service := range services {
@@ -65,13 +27,28 @@ func (cmd Command) {{ .MethodName }}(authUser *common.UserInfo, req *dto.{{ .Req
 				MethodName       string
 				RequestType      string
 				ResponseType     string
+				PackageName      string
 			}{
 				ServiceName:      service.SName,
 				ServiceNameLower: strings.ToLower(service.SName),
 				MethodName:       method.MName,
 				RequestType:      method.RequestType,
 				ResponseType:     method.ResponseType,
+				PackageName:      service.PackageName,
 			}
+
+			internalSegment := "internal"
+			index := strings.Index(modulePath, internalSegment)
+			if index != -1 {
+				relativePath := modulePath[index+len(internalSegment):]
+				if strings.HasPrefix(relativePath, "/") {
+					relativePath = strings.TrimPrefix(relativePath, "/")
+				}
+				modulePath = relativePath
+			}
+
+			tmplPath := filepath.Join(outputPath, "templates", modulePath, "app", fmt.Sprintf("%s.tmpl", method.MName))
+			fmt.Println("tmplPath:", tmplPath)
 
 			// Parse the template
 			tmpl, err := template.ParseFiles(tmplPath)
@@ -91,7 +68,7 @@ func (cmd Command) {{ .MethodName }}(authUser *common.UserInfo, req *dto.{{ .Req
 				return fmt.Errorf("error formatting code: %v", err)
 			}
 
-			dirPath := filepath.Join(".", "internal/app")
+			dirPath := filepath.Join(outputPath, "internal", modulePath, "app")
 
 			// Check if the directory exists
 			if _, err := os.Stat(dirPath); os.IsNotExist(err) {

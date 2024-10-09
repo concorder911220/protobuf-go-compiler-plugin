@@ -7,73 +7,15 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
 // GenerateTypes generates Go types and interfaces from protobuf messages.
-func GenerateTypes(messages []Message, enums []Enum, generateTypes bool, services []Service, hasTimestamp bool) error {
+func GenerateTypes(messages []Message, enums []Enum, generateTypes bool, services []Service, modulePath string, outputPath string, hasTimestamp bool) error {
 	if !generateTypes {
 		return nil
 	}
-	tmplPath := filepath.Join(".", "templates", "types.tmpl")
-
-	// Check if the template file exists
-	if _, err := os.Stat(tmplPath); os.IsNotExist(err) {
-		// Create the template file with the default content
-		defaultTemplate := `package app
-
-{{ if .HasTimestamp }}
-import timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-{{ end }}
-
-{{- range .Enums }}
-type {{ .EnumName }} int32
-
-const (
-{{- range .Values }}
-	{{ .Name }} {{ .PName }} = {{ .Value }} 
-{{- end }}
-)
-{{- end }}
-
-{{- range .Messages }}
-type {{ .MessageName }} struct {
-{{- range .Fields }}
-	{{ .Name }} {{ .Type }}
-{{- end }}
-}
-{{- end }}
-
-{{- range .Services }}
-type {{ .SName }} interface {
-	{{- range .Methods }}
-	{{ .MName }}(req *{{ .RequestType }}) (*{{ .ResponseType }}, error)
-	{{- end }}
-}
-{{- end }}`
-
-		// Ensure the "internal/templates" directory exists
-		if err := os.MkdirAll(filepath.Dir(tmplPath), os.ModePerm); err != nil {
-			log.Fatalf("Failed to create directories: %v", err)
-		}
-
-		// Write the default template content to the file
-		err = os.WriteFile(tmplPath, []byte(defaultTemplate), 0644)
-		if err != nil {
-			log.Fatalf("Failed to create template file: %v", err)
-		}
-
-		log.Println("Template file created:", tmplPath)
-	} else {
-		log.Println("Template file already exists:", tmplPath)
-	}
-
-	// Parse the template
-	tmpl, err := template.ParseFiles(tmplPath)
-	if err != nil {
-		return err
-	}
-
 	// Data to be passed to the template
 	data := struct {
 		Messages     []Message
@@ -85,6 +27,23 @@ type {{ .SName }} interface {
 		Enums:        enums,
 		Services:     services,
 		HasTimestamp: hasTimestamp,
+	}
+
+	internalSegment := "internal"
+	index := strings.Index(modulePath, internalSegment)
+	if index != -1 {
+		relativePath := modulePath[index+len(internalSegment):]
+		if strings.HasPrefix(relativePath, "/") {
+			relativePath = strings.TrimPrefix(relativePath, "/")
+		}
+		modulePath = relativePath
+	}
+
+	tmplPath := filepath.Join(outputPath, "templates", modulePath, "type.tmpl")
+	fmt.Println("tmplPath:", tmplPath)
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		return err
 	}
 
 	// Execute the template
@@ -99,7 +58,7 @@ type {{ .SName }} interface {
 		return fmt.Errorf("error formatting code: %v", err)
 	}
 
-	dirPath := filepath.Join(".", "interface")
+	dirPath := filepath.Join(outputPath, "internal", modulePath, "types_and_interfaces")
 
 	// Check if the directory exists
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
@@ -110,12 +69,13 @@ type {{ .SName }} interface {
 		}
 	}
 
-	// Write the generated file
-	outputPath := filepath.Join(dirPath, "types_and_interfaces.go")
-	if err := os.WriteFile(outputPath, formattedCode, 0644); err != nil {
+	// Write the generated service file
+	_outputPath := filepath.Join(dirPath, "types.go")
+	fmt.Println("_outputPath:", _outputPath)
+	if err := os.WriteFile(_outputPath, formattedCode, 0644); err != nil {
 		return fmt.Errorf("error writing file: %v", err)
 	}
 
-	fmt.Printf("Generated: %s\n", outputPath)
+	fmt.Printf("Generated: %s\n", _outputPath)
 	return nil
 }
