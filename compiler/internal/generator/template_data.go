@@ -18,14 +18,17 @@ type Field struct {
 	Number       int
 	ProtoName    string
 	HasTimestamp bool
+	// Optional  string
 }
 
 type Service struct {
-	SName   string
-	Methods []Method
+	PackageName string
+	SName       string
+	Methods     []Method
 }
 
 type Method struct {
+	PackageName  string
 	PName        string
 	MName        string
 	RequestType  string
