@@ -22,11 +22,13 @@ func GenerateTypes(messages []Message, enums []Enum, generateTypes bool, service
 		Enums        []Enum
 		Services     []Service
 		HasTimestamp bool
+		ModulePath   string
 	}{
 		Messages:     messages,
 		Enums:        enums,
 		Services:     services,
 		HasTimestamp: hasTimestamp,
+		ModulePath:   modulePath,
 	}
 
 	internalSegment := "internal"

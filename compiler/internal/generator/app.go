@@ -18,9 +18,11 @@ func GenerateApp(services []Service, generateService bool, modulePath string, ou
 	}
 	// Prepare the data for the template
 	data := struct {
-		Services []Service
+		Services   []Service
+		ModulePath string
 	}{
-		Services: services,
+		Services:   services,
+		ModulePath: modulePath,
 	}
 
 	internalSegment := "internal"
