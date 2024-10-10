@@ -28,6 +28,7 @@ func GenerateMethods(services []Service, generateMethods bool, modulePath string
 				RequestType      string
 				ResponseType     string
 				PackageName      string
+				ModulePath       string
 			}{
 				ServiceName:      service.SName,
 				ServiceNameLower: strings.ToLower(service.SName),
@@ -35,6 +36,7 @@ func GenerateMethods(services []Service, generateMethods bool, modulePath string
 				RequestType:      method.RequestType,
 				ResponseType:     method.ResponseType,
 				PackageName:      service.PackageName,
+				ModulePath:       modulePath,
 			}
 
 			internalSegment := "internal"
