@@ -1,0 +1,11 @@
+version: v1
+plugins:
+  - plugin: gbtemplate
+    out: ../
+    opt: types=true
+  - plugin: gbtemplate
+    out: ../
+    opt: services=true
+  - plugin: gbtemplate
+    out: ../
+    opt: methods=true
