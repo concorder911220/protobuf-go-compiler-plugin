@@ -1,11 +1,9 @@
 - Perspectives
   This plugin is generating methods, types and interface and service from proto files.
-  After running this command, you will see templates folder which has command.tmpl, service.tmpl and types.tmpl.
+  After running this command, you will see templates folder which has module.tmpl, service_gen.tmpl and types.tmpl, app.tmpl, {method}.tmpl
   Of course you can modify this template but you should consider templates have their own types.
 
-methods: Servive
-service: Service
-types: [] Message, [] Enum, [] Service,
+package types
 
 type TemplateData struct {
 PackageName string
@@ -24,7 +22,6 @@ Name string
 Type string
 Number int
 ProtoName string
-HasTimestamp bool
 }
 
 type Service struct {
@@ -33,8 +30,7 @@ Methods []Method
 }
 
 type Method struct {
-PName string
-MName string
+Name string
 RequestType string
 ResponseType string
 }
@@ -54,9 +50,12 @@ Value int32
 
 1. set your plugin application PATH as your environment PATH.
 2. copy buf.gen.yaml and buf.yaml files to your proto directory.
+   You can sepcify your output directory in buf.yaml file by using opt: methods=true,out=../.
 3. run buf build
 4. run buf generate
-5. This command will generate internal/app directory with methods, templates folder with 3 tmpl files, interface folder with types_and_interface.go and service.go inside internal directory.
+5. This command will generate template folders files in templates folder for each app, methods, services, types and modules.
+   These templates are default templates. You can modify them as you want.
+
 6. After you modify template, you can also run buf generate command again so you can get updated go files.
 
 - Becareful: There is one consideration while making proto schema.
