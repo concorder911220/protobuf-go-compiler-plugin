@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/NewGlassbiller/go-sandbox/compiler/claim/gb"
 	"github.com/NewGlassbiller/go-sandbox/compiler/internal/generator"
 	"github.com/NewGlassbiller/go-sandbox/compiler/internal/utils"
+	"github.com/NewGlassbiller/go-sandbox/compiler/modulePath/gb"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 )
