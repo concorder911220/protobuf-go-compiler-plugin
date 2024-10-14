@@ -1,5 +1,18 @@
 package generator
 
+type SupplyData struct {
+	TypeData   TypeData
+	ModulePath string
+	OutputPath string
+}
+
+type TypeData struct {
+	PackageName string
+	Messages    []Message
+	Enums       []Enum
+	Services    []Service
+}
+
 type TemplateData struct {
 	PackageName  string
 	Messages     []Message

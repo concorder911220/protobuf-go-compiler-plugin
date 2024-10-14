@@ -17,7 +17,7 @@ import (
 func main() {
 	log.SetOutput(os.Stderr)
 	protogen.Options{}.Run(func(plugin *protogen.Plugin) error {
-		var generateMethods, generateTypes, generateService bool
+		var generateMethods, generateModules bool
 		outputPath := "./"
 		options := plugin.Request.GetParameter()
 
@@ -31,18 +31,16 @@ func main() {
 			switch key {
 			case "methods":
 				generateMethods = (value == "true")
-			case "types":
-				generateTypes = (value == "true")
-			case "services":
-				generateService = (value == "true")
+			case "modules":
+				generateModules = (value == "true")
 			case "out":
 				outputPath = value
 			}
 
 		}
 
-		if !generateMethods && !generateTypes && !generateService {
-			fmt.Println("Please specify at least one of 'methods=true' or 'types=true'")
+		if !generateMethods && !generateModules {
+			fmt.Println("Please specify at least one of 'methods=true' or 'modules=true'")
 			os.Exit(1)
 		}
 
@@ -50,38 +48,23 @@ func main() {
 		if err := generateTemplates(moduleData, outputPath); err != nil {
 			return err
 		}
-		// fmt.Println("moduleData:", moduleData)
+		fmt.Println("moduleData:", moduleData)
 		fmt.Println("gbPackageName:", gbPackageName)
-		if generateTypes {
+		if generateModules {
 			for modulePath, data := range moduleData {
-				if err := generator.GenerateTypes(data.Messages, data.Enums, generateTypes, data.Services, modulePath, outputPath, HasTimestampFunc(data.Messages)); err != nil {
+				if err := generator.GenerateModules(data.TypeData, modulePath, outputPath, HasTimestampFunc(data.TypeData.Messages)); err != nil {
 					return err
 				}
 			}
 		}
 
-		if generateMethods {
-			for modulePath, data := range moduleData {
-				if err := generator.GenerateMethods(data.Services, generateMethods, modulePath, outputPath); err != nil {
-					return err
-				}
-			}
-		}
-
-		if generateService {
-			for modulePath, data := range moduleData {
-				fmt.Println("called")
-				if err := generator.GenerateServices(data.Services, generateService, modulePath, outputPath); err != nil {
-					return err
-				}
-				if err := generator.GenerateApp(data.Services, generateService, modulePath, outputPath); err != nil {
-					return err
-				}
-				if err := generator.GenerateModule(data.Services, generateService, modulePath, outputPath); err != nil {
-					return err
-				}
-			}
-		}
+		// if generateMethods {
+		// 	for modulePath, data := range moduleData {
+		// 		if err := generator.GenerateMethods(data.Services, generateMethods, modulePath, outputPath); err != nil {
+		// 			return err
+		// 		}
+		// 	}
+		// }
 
 		return nil
 	})
@@ -99,14 +82,10 @@ func HasTimestampFunc(messages []generator.Message) bool {
 }
 
 func collectProtobufData(plugin *protogen.Plugin) (map[string]struct {
-	Messages []generator.Message
-	Enums    []generator.Enum
-	Services []generator.Service
+	TypeData generator.TypeData
 }, string) {
 	moduleData := make(map[string]struct {
-		Messages []generator.Message
-		Enums    []generator.Enum
-		Services []generator.Service
+		TypeData generator.TypeData
 	})
 	var gbPackageName string
 
@@ -125,9 +104,7 @@ func collectProtobufData(plugin *protogen.Plugin) (map[string]struct {
 			// Initialize the entry if it doesn't exist
 			if _, exists := moduleData[modulePath]; !exists {
 				moduleData[modulePath] = struct {
-					Messages []generator.Message
-					Enums    []generator.Enum
-					Services []generator.Service
+					TypeData generator.TypeData
 				}{}
 			}
 
@@ -153,7 +130,7 @@ func collectProtobufData(plugin *protogen.Plugin) (map[string]struct {
 
 				// Get the current data for the module path
 				moduleEntry := moduleData[modulePath]
-				moduleEntry.Messages = append(moduleEntry.Messages, generator.Message{
+				moduleEntry.TypeData.Messages = append(moduleEntry.TypeData.Messages, generator.Message{
 					MessageName: string(msg.Desc.Name()),
 					Fields:      fields,
 				})
@@ -175,7 +152,7 @@ func collectProtobufData(plugin *protogen.Plugin) (map[string]struct {
 
 				// Get the current data for the module path
 				moduleEntry := moduleData[modulePath]
-				moduleEntry.Enums = append(moduleEntry.Enums, generator.Enum{
+				moduleEntry.TypeData.Enums = append(moduleEntry.TypeData.Enums, generator.Enum{
 					EnumName: string(enum.Desc.Name()),
 					Values:   enumValues,
 				})
@@ -199,7 +176,7 @@ func collectProtobufData(plugin *protogen.Plugin) (map[string]struct {
 
 				// Get the current data for the module path
 				moduleEntry := moduleData[modulePath]
-				moduleEntry.Services = append(moduleEntry.Services, generator.Service{
+				moduleEntry.TypeData.Services = append(moduleEntry.TypeData.Services, generator.Service{
 					PackageName: string(file.GoPackageName),
 					SName:       string(service.Desc.Name()),
 					Methods:     methods,
@@ -216,9 +193,7 @@ func collectProtobufData(plugin *protogen.Plugin) (map[string]struct {
 }
 
 func generateTemplates(moduleData map[string]struct {
-	Messages []generator.Message
-	Enums    []generator.Enum
-	Services []generator.Service
+	TypeData generator.TypeData
 }, outputPath string) error {
 	for modulePath, data := range moduleData {
 		// Extract the path after "internal/"
@@ -381,7 +356,7 @@ func generateTemplates(moduleData map[string]struct {
 		}
 
 		// Generate method templates for each service
-		for _, service := range data.Services {
+		for _, service := range data.TypeData.Services {
 			for _, method := range service.Methods {
 				methodFilePath := filepath.Join(appDir, fmt.Sprintf("%s.tmpl", method.MName))
 
