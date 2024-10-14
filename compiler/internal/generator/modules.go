@@ -10,7 +10,7 @@ import (
 	"text/template"
 )
 
-// GenerateTypes generates Go types and interfaces from protobuf messages.
+// GenerateModules generates all go files from templates.
 func GenerateModules(TypeData TypeData, modulePath string, outputPath string, hasTimestamp bool) error {
 	data := struct {
 		Messages     []Message
