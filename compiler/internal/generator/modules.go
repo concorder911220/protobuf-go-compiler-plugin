@@ -11,33 +11,25 @@ import (
 )
 
 // GenerateModules generates all go files from templates.
-func GenerateModules(TypeData TypeData, modulePath string, outputPath string, hasTimestamp bool) error {
+func GenerateModules(SupplyData SupplyData, outputPath string, templatePath string, hasTimestamp bool) error {
 	data := struct {
 		Messages     []Message
 		Enums        []Enum
 		Services     []Service
 		HasTimestamp bool
 		ModulePath   string
+		ModuleName   string
 	}{
-		Messages:     TypeData.Messages,
-		Enums:        TypeData.Enums,
-		Services:     TypeData.Services,
+		Messages:     SupplyData.TypeData.Messages,
+		Enums:        SupplyData.TypeData.Enums,
+		Services:     SupplyData.TypeData.Services,
 		HasTimestamp: hasTimestamp,
-		ModulePath:   modulePath,
-	}
-
-	internalSegment := "internal"
-	index := strings.Index(modulePath, internalSegment)
-	if index != -1 {
-		relativePath := modulePath[index+len(internalSegment):]
-		if strings.HasPrefix(relativePath, "/") {
-			relativePath = strings.TrimPrefix(relativePath, "/")
-		}
-		modulePath = relativePath
+		ModulePath:   SupplyData.MetaInfo.ModulePath,
+		ModuleName:   SupplyData.MetaInfo.ModuleName,
 	}
 
 	// Define the templates directory
-	templatesDir := filepath.Join(outputPath, "templates", modulePath)
+	templatesDir := filepath.Join(outputPath, templatePath, data.ModuleName)
 	fmt.Println("Templates Directory:", templatesDir)
 
 	// List only the root-level template files
@@ -53,7 +45,7 @@ func GenerateModules(TypeData TypeData, modulePath string, outputPath string, ha
 			if file.Name() == "app" {
 				// Read the app/app.tmpl file
 				appTemplatePath := filepath.Join(templatesDir, "app", "app.tmpl")
-				if err := processTemplate(appTemplatePath, data, outputPath, modulePath, "app"); err != nil {
+				if err := processTemplate(appTemplatePath, data, outputPath, data.ModuleName, "app"); err != nil {
 					return err
 				}
 			}
@@ -63,7 +55,7 @@ func GenerateModules(TypeData TypeData, modulePath string, outputPath string, ha
 		// Check if the file is a .tmpl file in the root directory
 		if strings.HasSuffix(file.Name(), ".tmpl") {
 			templatePath := filepath.Join(templatesDir, file.Name())
-			if err := processTemplate(templatePath, data, outputPath, modulePath, ""); err != nil {
+			if err := processTemplate(templatePath, data, outputPath, data.ModuleName, ""); err != nil {
 				return err
 			}
 		}
@@ -93,7 +85,7 @@ func processTemplate(templatePath string, data interface{}, outputPath, modulePa
 	}
 
 	// Prepare output directory based on the subdirectory
-	dirPath := filepath.Join(outputPath, "internal", modulePath, subDir)
+	dirPath := filepath.Join(outputPath, modulePath, subDir)
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
 		// Create the directory (with any necessary parent directories)
 		err := os.MkdirAll(dirPath, os.ModePerm)

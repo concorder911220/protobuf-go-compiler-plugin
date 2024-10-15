@@ -2,13 +2,19 @@ syntax = "proto3";
 
 package gb.insurance.claim.v1;
 
-option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/claim/grpc";
 import "proto/gb.proto";
 
-option (gb_module_path) = "github.com/NewGlassbiller/gb-services-insurance/internal/claim";
-
 import "proto/claim_msg.proto";
+
 import "google/api/annotations.proto";
+
+import "proto/module_name.proto";
+
+option (gb_module_name) = "claim";
+
+option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/claim/grpc";
+
+option (gb_module_path) = "github.com/NewGlassbiller/gb-services-insurance/internal/claim";
 
 service Claim {
   rpc CreateClaim(CreateClaimRequest) returns (CreateClaimResponse) {

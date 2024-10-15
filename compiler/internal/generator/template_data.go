@@ -1,7 +1,12 @@
 package generator
 
 type SupplyData struct {
-	TypeData   TypeData
+	TypeData TypeData
+	MetaInfo MetaInfo
+}
+
+type MetaInfo struct {
+	ModuleName string
 	ModulePath string
 	OutputPath string
 }
