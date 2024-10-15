@@ -4,6 +4,9 @@ package gb.insurance.claim.v1;
 
 import "google/protobuf/timestamp.proto";
 import "proto/gb.proto";
+import "proto/module_name.proto";
+
+option (gb_module_name) = "claim";
 
 option (gb_module_path) = "github.com/NewGlassbiller/gb-services-insurance/internal/claim";
 
