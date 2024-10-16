@@ -85,5 +85,5 @@ Value int32
 - Becareful: There is one consideration while making proto schema.
   You should define field name "snake_case".
 
-protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=modules=true,out=../internal,tplpath=templates_folder:. ./proto/_.proto
-protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=types=true,out=../internal,tplpath=templates_folder:. ./proto/_.proto
+protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate*out=modules=true,out=../internal,tplpath=../templates_folder:. ./proto/*.proto
+protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate*out=types=true,out=../internal,tplpath=../templates_folder:. ./proto/*.proto

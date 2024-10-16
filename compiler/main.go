@@ -45,11 +45,6 @@ func main() {
 		}
 
 		moduleData, gbPackageName := helpers.CollectProtobufData(plugin, outputPath)
-		if err := helpers.GenerateTemplates(moduleData, outputPath, templatePath); err != nil {
-			return err
-		}
-
-		fmt.Println("moduleData:", moduleData)
 		fmt.Println("gbPackageName:", gbPackageName)
 		if generateModules {
 			for _, data := range moduleData {
@@ -59,13 +54,13 @@ func main() {
 			}
 		}
 
-		// if generateMethods {
-		// 	for modulePath, data := range moduleData {
-		// 		if err := generator.GenerateMethods(data.Services, generateMethods, modulePath, outputPath); err != nil {
-		// 			return err
-		// 		}
-		// 	}
-		// }
+		if generateMethods {
+			for _, data := range moduleData {
+				if err := generator.GenerateMethods(data.SupplyData, outputPath, templatePath); err != nil {
+					return err
+				}
+			}
+		}
 
 		return nil
 	})

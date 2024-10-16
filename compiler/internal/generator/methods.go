@@ -45,7 +45,7 @@ func GenerateMethods(SupplyData SupplyData, outputPath string, templatePath stri
 				prefix = "cmd_" // Change prefix if IsCommand is true
 			}
 
-			tmplPath := filepath.Join(outputPath, templatePath, data.ModuleName, "app", fmt.Sprintf("%s_%s.tmpl", prefix, method.MName))
+			tmplPath := filepath.Join(templatePath, data.ModuleName, "app", fmt.Sprintf("%s_%s.tmpl", prefix, method.MName))
 			fmt.Println("tmplPath:", tmplPath)
 
 			// Parse the template
