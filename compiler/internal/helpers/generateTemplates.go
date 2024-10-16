@@ -163,7 +163,11 @@ func GenerateTemplates(moduleData map[string]struct {
 		// Generate method templates for each service
 		for _, service := range data.SupplyData.TypeData.Services {
 			for _, method := range service.Methods {
-				methodFilePath := filepath.Join(appDir, fmt.Sprintf("%s.tmpl", method.MName))
+				prefix := "q_" // Default prefix
+				if method.IsCommand {
+					prefix = "cmd_" // Change prefix if IsCommand is true
+				}
+				methodFilePath := filepath.Join(appDir, fmt.Sprintf("%s_%s.tmpl", prefix, method.MName))
 
 				// Check if the template file exists
 				if _, err := os.Stat(methodFilePath); os.IsNotExist(err) {

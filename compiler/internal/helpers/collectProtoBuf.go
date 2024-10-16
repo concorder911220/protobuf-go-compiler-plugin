@@ -1,8 +1,11 @@
 package helpers
 
 import (
+	"fmt"
+
 	"github.com/NewGlassbiller/go-sandbox/compiler/internal/generator"
 	"github.com/NewGlassbiller/go-sandbox/compiler/internal/utils"
+	isCommand "github.com/NewGlassbiller/go-sandbox/compiler/isCommand/gb"
 	moduleName "github.com/NewGlassbiller/go-sandbox/compiler/moduleName/gb"
 	"github.com/NewGlassbiller/go-sandbox/compiler/modulePath/gb"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -106,12 +109,16 @@ func CollectProtobufData(plugin *protogen.Plugin, outputPath string) (map[string
 			for _, service := range file.Services {
 				var methods []generator.Method
 				for _, method := range service.Methods {
+					isCommandValue := proto.GetExtension(method.Desc.Options(), isCommand.E_IsCommand)
+
+					fmt.Println("method type ", isCommandValue)
 					methods = append(methods, generator.Method{
 						PackageName:  string(file.GoPackageName),
 						PName:        string(service.Desc.Name()),
 						MName:        string(method.Desc.Name()),
 						RequestType:  method.Input.GoIdent.GoName,
 						ResponseType: method.Output.GoIdent.GoName,
+						IsCommand:    isCommandValue != nil && isCommandValue.(bool),
 					})
 				}
 

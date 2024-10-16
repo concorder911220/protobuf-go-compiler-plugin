@@ -1,0 +1,8 @@
+syntax = "proto3";
+package gb.insurance.claim.v1;
+import "google/protobuf/descriptor.proto";
+option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/gb";
+
+extend google.protobuf.MethodOptions {
+  optional bool is_command = 70000;
+}
