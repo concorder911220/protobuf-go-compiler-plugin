@@ -2,8 +2,8 @@ version: v1
 plugins:
   - plugin: gbtemplate
     out: ../
-    opt: modules=true,out=../
+    opt: modules=true,out=../internal,tplpath=../templates
 
-  # - plugin: gbtemplate
-  #   out: ../
-  #   opt: methods=true,out=../
+  - plugin: gbtemplate
+    out: ../
+    opt: methods=true,out=../,tplpath=../templates
