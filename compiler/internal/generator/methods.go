@@ -14,12 +14,9 @@ import (
 )
 
 // GenerateMethods generates the method handler templates.
-func GenerateMethods(services []Service, generateMethods bool, modulePath string, outputPath string) error {
-	if !generateMethods {
-		return nil
-	}
+func GenerateMethods(SupplyData SupplyData, outputPath string, templatePath string) error {
 
-	for _, service := range services {
+	for _, service := range SupplyData.TypeData.Services {
 		for _, method := range service.Methods {
 			data := struct {
 				ServiceName      string
@@ -28,7 +25,9 @@ func GenerateMethods(services []Service, generateMethods bool, modulePath string
 				RequestType      string
 				ResponseType     string
 				PackageName      string
+				ModuleName       string
 				ModulePath       string
+				IsCommand        bool
 			}{
 				ServiceName:      service.SName,
 				ServiceNameLower: strings.ToLower(service.SName),
@@ -36,20 +35,17 @@ func GenerateMethods(services []Service, generateMethods bool, modulePath string
 				RequestType:      method.RequestType,
 				ResponseType:     method.ResponseType,
 				PackageName:      service.PackageName,
-				ModulePath:       modulePath,
+				ModuleName:       SupplyData.MetaInfo.ModuleName,
+				ModulePath:       SupplyData.MetaInfo.ModulePath,
+				IsCommand:        method.IsCommand,
 			}
 
-			internalSegment := "internal"
-			index := strings.Index(modulePath, internalSegment)
-			if index != -1 {
-				relativePath := modulePath[index+len(internalSegment):]
-				if strings.HasPrefix(relativePath, "/") {
-					relativePath = strings.TrimPrefix(relativePath, "/")
-				}
-				modulePath = relativePath
+			prefix := "q_" // Default prefix
+			if method.IsCommand {
+				prefix = "cmd_" // Change prefix if IsCommand is true
 			}
 
-			tmplPath := filepath.Join(outputPath, "templates", modulePath, "app", fmt.Sprintf("%s.tmpl", method.MName))
+			tmplPath := filepath.Join(outputPath, templatePath, data.ModuleName, "app", fmt.Sprintf("%s_%s.tmpl", prefix, method.MName))
 			fmt.Println("tmplPath:", tmplPath)
 
 			// Parse the template
@@ -70,7 +66,7 @@ func GenerateMethods(services []Service, generateMethods bool, modulePath string
 				return fmt.Errorf("error formatting code: %v", err)
 			}
 
-			dirPath := filepath.Join(outputPath, "internal", modulePath, "app")
+			dirPath := filepath.Join(outputPath, data.ModuleName, "app")
 
 			// Check if the directory exists
 			if _, err := os.Stat(dirPath); os.IsNotExist(err) {

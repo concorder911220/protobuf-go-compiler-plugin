@@ -51,6 +51,7 @@ type Method struct {
 	MName        string
 	RequestType  string
 	ResponseType string
+	IsCommand    bool
 }
 
 type Enum struct {

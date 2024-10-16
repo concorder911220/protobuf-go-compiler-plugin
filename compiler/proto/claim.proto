@@ -9,6 +9,7 @@ import "proto/claim_msg.proto";
 import "google/api/annotations.proto";
 
 import "proto/module_name.proto";
+import "proto/is_command.proto";
 
 option (gb_module_name) = "claim";
 
@@ -16,36 +17,44 @@ option go_package = "github.com/NewGlassbiller/gb-services-insurance/pkg/proto/c
 
 option (gb_module_path) = "github.com/NewGlassbiller/gb-services-insurance/internal/claim";
 
+
+
 service Claim {
   rpc CreateClaim(CreateClaimRequest) returns (CreateClaimResponse) {
+    option (is_command) = true;
     option (google.api.http) = {
       post : "/claim"
       body : "*"
     };
   };
   rpc UpdateClaim(UpdateClaimRequest) returns (UpdateClaimResponse) {
+    option (is_command) = true;
     option (google.api.http) = {
       patch : "/claim/{id}"
       body : "*"
     };
   };
   rpc GetClaim(GetClaimRequest) returns (GetClaimResponse) {
+    option (is_command) = false;
     option (google.api.http) = {
       get : "/claim/{id}"
     };
   };
   rpc GetJobLastClaim(GetJobLastClaimRequest) returns (GetClaimResponse) {
+    option (is_command) = false;
     option (google.api.http) = {
       get : "/claim/last_by_job/{job_id}"
     };
   };
   rpc ListClaim(ListClaimRequest) returns (ListClaimResponse) {
+    option (is_command) = false;
     option (google.api.http) = {
       get : "/claim"
     };
   };
   rpc AcknowledgeClaim(AcknowledgeClaimRequest)
       returns (AcknowledgeClaimResponse) {
+        option (is_command) = true;
     option (google.api.http) = {
       post : "/claim/{id}/acknowledge"
       body : "*"
@@ -53,14 +62,17 @@ service Claim {
   }
   rpc UpdateCoverage(UpdateCoverageRequest)
       returns (UpdateCoverageResponse) {
+        option (is_command) = true;
     option (google.api.http) = {
       post : "/claim/coverage"
       body : "*"
     };
   }
   rpc ListInsurer(ListInsurerRequest) returns (ListInsurerResponse) {
+    option (is_command) = false;
     option (google.api.http) = {
       get : "/insurer"
     };
   };
 }
+

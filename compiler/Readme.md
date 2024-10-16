@@ -3,7 +3,25 @@
   After running this command, you will see templates folder which has module.tmpl, service_gen.tmpl and types.tmpl, app.tmpl, {method}.tmpl
   Of course you can modify this template but you should consider templates have their own types.
 
-package types
+package generator
+
+type SupplyData struct {
+TypeData TypeData
+MetaInfo MetaInfo
+}
+
+type MetaInfo struct {
+ModuleName string
+ModulePath string
+OutputPath string
+}
+
+type TypeData struct {
+PackageName string
+Messages []Message
+Enums []Enum
+Services []Service
+}
 
 type TemplateData struct {
 PackageName string
@@ -22,17 +40,23 @@ Name string
 Type string
 Number int
 ProtoName string
+HasTimestamp bool
+// Optional string
 }
 
 type Service struct {
+PackageName string
 SName string
 Methods []Method
 }
 
 type Method struct {
-Name string
+PackageName string
+PName string
+MName string
 RequestType string
 ResponseType string
+IsCommand bool
 }
 
 type Enum struct {
@@ -61,26 +85,5 @@ Value int32
 - Becareful: There is one consideration while making proto schema.
   You should define field name "snake_case".
 
-f.e:
-
-message Vehicle {
-int32 id = 1;
-string vin = 2;
-int32 year = 3;
-string make = 4;
-string model = 5;
-string plate_number = 6;
-string image_url = 7;
-string thumb_url = 8;
-VehicleOwnership ownership = 9;
-string nags_id = 10;
-VehicleType vehicle_type = 11;
-int32 number = 12; // Vehicle number in the policy (to vehicle if multiple vehicles in the policy)
-string style = 13;
-int32 make_id = 14;
-int32 model_id = 15;
-}
-
-Please consider VehicleType, because in current insurance repo, it is defined as VehicleType type = 11;
-But it should be defined as vehicle_type in this plugin.
-We need to investigate about this issue.
+protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=modules=true,out=../internal,tplpath=templates_folder:. ./proto/_.proto
+protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=types=true,out=../internal,tplpath=templates_folder:. ./proto/_.proto
