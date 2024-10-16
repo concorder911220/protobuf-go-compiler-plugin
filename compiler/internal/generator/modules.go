@@ -29,7 +29,7 @@ func GenerateModules(SupplyData SupplyData, outputPath string, templatePath stri
 	}
 
 	// Define the templates directory
-	templatesDir := filepath.Join(outputPath, templatePath, data.ModuleName)
+	templatesDir := filepath.Join(templatePath, data.ModuleName)
 	fmt.Println("Templates Directory:", templatesDir)
 
 	// List only the root-level template files
