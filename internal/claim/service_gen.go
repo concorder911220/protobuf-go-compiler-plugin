@@ -8,14 +8,14 @@ import (
 	"reflect"
 )
 
-type ClaimService struct {
-	grpcgen.UnimplementedClaimServer
+type Service struct {
+	grpcgen.UnimplementedServer
 	command *app.Command
 	query   *app.Query
 }
 
-func NewClaimService(command *app.Command, query *app.Query) *ClaimService {
-	return &ClaimService{
+func NewService(command *app.Command, query *app.Query) *Service {
+	return &Service{
 		command: command,
 		query:   query,
 	}

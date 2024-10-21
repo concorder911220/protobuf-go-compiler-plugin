@@ -10,14 +10,14 @@ import (
 )
 
 {{- range .Services }}
-type {{ .SName }}Service struct {
-	grpcgen.Unimplemented{{ .SName }}Server
+type Service struct {
+	grpcgen.UnimplementedServer
 	command *app.Command
 	query   *app.Query
 }
 
-func New{{ .SName }}Service(command *app.Command, query *app.Query) *{{ .SName }}Service {
-	return &{{ .SName }}Service{
+func NewService(command *app.Command, query *app.Query) *Service {
+	return &Service{
 		command: command,
 		query:   query,
 	}
