@@ -107,8 +107,8 @@ type EnumValue struct {
 # Command example
 
 ```bash
-protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=modules=true,out=../internal,tplpath=../templates_folder:. ./proto/*.proto
-protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=types=true,out=../internal,tplpath=../templates_folder:. ./proto/*.proto
+protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=modules=true,out=../internal,tplpath=gotemplate_gen:. ./proto/*.proto
+protoc --plugin=protoc-gen-gbtemplate=./protoc-gen-gbtemplate --gbtemplate_out=types=true,out=../internal,tplpath=gotemplate_gen:. ./proto/*.proto
 ```
 
 ## 📫 How to contribute:
@@ -118,9 +118,9 @@ version: v1
 plugins:
   - plugin: gbtemplate
     out: ../
-    opt: modules=true,out=../internal,tplpath=../templates
+    opt: modules=true,out=../internal,tplpath=gotemplate_gen
 
   - plugin: gbtemplate
     out: ../
-    opt: methods=true,out=../,tplpath=../templates
+    opt: methods=true,out=../internal,tplpath=gotemplate_gen
 ```

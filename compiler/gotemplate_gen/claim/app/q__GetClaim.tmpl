@@ -1,0 +1,14 @@
+package app
+
+import (
+	"time"
+	"{{.ModulePath}}/domain"
+	"{{.ModulePath}}"
+	"gorm.io/gorm"
+)
+
+
+func (query *Query) {{ .MethodName }}(req *dto.{{ .RequestType }}) (*dto.{{ .ResponseType }}, error) {
+	// TODO: Add your logic here for {{ .MethodName }}
+	return nil, nil
+}

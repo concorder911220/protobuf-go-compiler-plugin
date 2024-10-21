@@ -1,0 +1,14 @@
+package app
+
+import (
+	"errors"
+	"strings"
+	"{{.ModulePath}}/domain"
+	"{{.ModulePath}}"
+)
+
+
+func (cmd Command) {{ .MethodName }}(req *dto.{{ .RequestType }}) (*dto.{{ .ResponseType }}, error) {
+	// TODO: Add your logic here for {{ .MethodName }}
+	return nil, nil
+}

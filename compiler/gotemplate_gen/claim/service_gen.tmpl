@@ -1,0 +1,32 @@
+package {{.ModuleName}}
+
+import (
+	"context"
+	"reflect"
+	"{{.ModulePath}}/app"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	
+)
+
+{{- range .Services }}
+type {{ .SName }}Service struct {
+	grpcgen.Unimplemented{{ .SName }}Server
+	command *app.Command
+	query   *app.Query
+}
+
+func New{{ .SName }}Service(command *app.Command, query *app.Query) *{{ .SName }}Service {
+	return &{{ .SName }}Service{
+		command: command,
+		query:   query,
+	}
+}
+
+{{- range .Methods }}
+func (s *{{ .PName }}Service) {{ .MName }}(ctx context.Context, req *dto.{{ .RequestType }}) (*dto.{{ .ResponseType }}, error) {
+	authUser, _ := ctx.Value(common.CtxUserKey{}).(common.UserInfo)
+	return s.command.{{ .MName }}(&authUser, req)
+}
+{{- end }}
+{{- end }}
